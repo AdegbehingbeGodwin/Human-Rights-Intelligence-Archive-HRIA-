@@ -17,6 +17,7 @@ dist/
 
 # Data and Cache (Critical for HRIA)
 data/
+docs/
 model_cache/
 *.log
 

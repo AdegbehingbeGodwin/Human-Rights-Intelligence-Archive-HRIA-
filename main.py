@@ -6,6 +6,7 @@ Uses HF API for embeddings + Local BM25 for hybrid search.
 import os
 import glob
 import requests
+from huggingface_hub import InferenceClient
 from typing import Optional, List
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
@@ -21,7 +22,6 @@ load_dotenv()
 
 # Configuration
 EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
-HF_API_URL = f"https://api-inference.huggingface.co/pipeline/feature-extraction/{EMBEDDING_MODEL_NAME}"
 HF_TOKEN = os.getenv("HUGGINGFACE_API_KEY")
 
 PINECONE_INDEX_NAME = "hria-fast"
@@ -43,23 +43,46 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+
 # Global instances
 pinecone_index = None
 groq_client = None
 bm25_searcher = None
+hf_client = None
 
 def get_huggingface_embeddings(text: str) -> List[float]:
-    """Fetch embeddings from HF API."""
-    if not HF_TOKEN:
-        raise Exception("HUGGINGFACE_API_KEY is missing. Please add it to your environment variables.")
-        
-    headers = {"Authorization": f"Bearer {HF_TOKEN}"}
-    response = requests.post(HF_API_URL, headers=headers, json={"inputs": text, "options": {"wait_for_model": True}})
+    """Fetch embeddings using the official HF InferenceClient."""
+    global hf_client
+    if not hf_client:
+        if not HF_TOKEN:
+             raise Exception("HUGGINGFACE_API_KEY is missing. Please add it to your environment variables.")
+        hf_client = InferenceClient(token=HF_TOKEN)
     
-    if response.status_code != 200:
-        raise Exception(f"Hugging Face API Error: {response.text}")
-    
-    return response.json()
+    try:
+        # Use feature_extraction task which returns the vector
+        embedding = hf_client.feature_extraction(text, model=EMBEDDING_MODEL_NAME)
+        # Convert from list of lists (batch) to single list if needed
+        if isinstance(embedding, list) and len(embedding) > 0 and isinstance(embedding[0], list):
+            return embedding[0]
+        # Some versions return numpy arrays, convert to list
+        if hasattr(embedding, "tolist"):
+            embedding = embedding.tolist()
+            if isinstance(embedding, list) and len(embedding) > 0 and isinstance(embedding[0], list):
+                return embedding[0]
+        return embedding
+    except Exception as e:
+        # Fallback to direct requests if InferenceClient fails, using the new router URL
+        print(f"InferenceClient failed, trying direct request: {e}")
+        URL = f"https://router.huggingface.co/hf-inference/models/{EMBEDDING_MODEL_NAME}"
+        headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+        response = requests.post(URL, headers=headers, json={"inputs": text, "options": {"wait_for_model": True}})
+        if response.status_code != 200:
+            raise Exception(f"Hugging Face API Error: {response.text}")
+        result = response.json()
+        if isinstance(result, list) and len(result) > 0 and isinstance(result[0], list):
+            return result[0]
+        return result
 
 class QueryRequest(BaseModel):
     query: str

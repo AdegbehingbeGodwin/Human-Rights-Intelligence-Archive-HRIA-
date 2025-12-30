@@ -17,7 +17,7 @@ interface ChatMessage {
   sources?: Source[];
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'https://human-rights-intelligence-archive-hria.onrender.com';
 
 const NarrativeRenderer: React.FC<{ text: string }> = ({ text }) => {
   const paragraphs = text.split(/\n\n+/);

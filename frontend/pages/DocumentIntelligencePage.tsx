@@ -109,14 +109,14 @@ const DocumentIntelligencePage: React.FC<DocumentIntelligencePageProps> = ({ doc
         {/* Chat History Area */}
         <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 md:space-y-12">
           {intelligence && (
-            <div className="space-y-6 animate-fade-in border-b border-archive-border pb-8">
+            <div className="space-y-6 animate-fade-in border border-archive-border bg-white p-6 rounded-2xl shadow-sm">
               <h3 className="text-[10px] uppercase tracking-widest font-bold text-archive-muted">Initial Assessment</h3>
               <p className="text-sm font-light text-archive-black leading-relaxed italic">
                 {intelligence.insights}
               </p>
               <div className="flex flex-wrap gap-2">
                 {intelligence.violations.map(v => (
-                  <span key={v} className="px-2 py-0.5 border border-archive-violation/30 text-archive-violation text-[9px] uppercase tracking-widest font-bold">
+                  <span key={v} className="px-2 py-0.5 border border-archive-violation/30 text-archive-violation text-[9px] uppercase tracking-widest font-bold rounded-md">
                     {v}
                   </span>
                 ))}
@@ -132,7 +132,7 @@ const DocumentIntelligencePage: React.FC<DocumentIntelligencePageProps> = ({ doc
                   <p className="text-sm font-medium text-archive-black">{msg.text}</p>
                 </div>
               ) : (
-                <div className="pl-6 py-1 border-l-2 border-archive-accent bg-archive-border/10 p-4">
+                <div className="pl-6 py-4 border-l-2 border-archive-accent bg-white border border-archive-border rounded-xl shadow-sm">
                   <p className="text-[9px] uppercase tracking-widest font-bold mb-2 text-archive-accent-darker text-archive-black">Archival Evidence</p>
                   <p className="text-sm text-archive-black font-light leading-relaxed serif whitespace-pre-wrap">{msg.text}</p>
                 </div>
@@ -150,22 +150,22 @@ const DocumentIntelligencePage: React.FC<DocumentIntelligencePageProps> = ({ doc
         </div>
 
         {/* Input Area */}
-        <div className="p-6 md:p-8 border-t border-archive-border bg-white flex-shrink-0">
-          <form onSubmit={handleInquiry} className="relative">
+        <div className="p-6 md:p-8 bg-archive-offwhite flex-shrink-0">
+          <form onSubmit={handleInquiry} className="relative bg-white border border-archive-border p-2 rounded-2xl shadow-lg">
             <input 
               type="text"
-              placeholder="Ask the archive about this document..."
+              placeholder="Ask the archive..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               disabled={queryLoading}
-              className="w-full bg-transparent border-b border-archive-black py-4 text-sm font-light focus:outline-none placeholder:text-archive-muted pr-12"
+              className="w-full bg-transparent px-4 py-3 text-sm font-light focus:outline-none placeholder:text-archive-muted pr-16"
             />
             <button 
               type="submit"
               disabled={!query.trim() || queryLoading}
-              className="absolute right-0 bottom-4 text-archive-black font-bold uppercase text-[10px] tracking-widest disabled:opacity-30"
+              className="absolute right-3 top-1/2 -translate-y-1/2 bg-archive-black text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase tracking-widest disabled:opacity-30"
             >
-              Send Inquiry
+              Inquire
             </button>
           </form>
           <div className="mt-4 flex justify-between items-center">

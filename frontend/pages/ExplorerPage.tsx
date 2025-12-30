@@ -21,7 +21,7 @@ const ExplorerPage: React.FC<ExplorerPageProps> = ({ onSelectDocument }) => {
             <ul className="space-y-3">
               {regions.map(r => (
                 <li key={r}>
-                  <button className="text-xs text-archive-muted hover:text-archive-black transition-colors">{r}</button>
+                  <button className="px-4 py-1.5 rounded-full text-left text-xs text-archive-muted hover:text-archive-black hover:bg-archive-accent/10 transition-all w-full">{r}</button>
                 </li>
               ))}
             </ul>
@@ -31,7 +31,7 @@ const ExplorerPage: React.FC<ExplorerPageProps> = ({ onSelectDocument }) => {
             <h3 className="text-[10px] uppercase tracking-widest font-bold text-archive-black mb-6">By Year</h3>
             <div className="grid grid-cols-2 gap-2">
               {years.map(y => (
-                <button key={y} className="text-xs text-archive-muted hover:text-archive-black text-left">{y}</button>
+                <button key={y} className="px-3 py-1.5 rounded-lg border border-transparent hover:border-archive-border text-xs text-archive-muted hover:text-archive-black text-center transition-all">{y}</button>
               ))}
             </div>
           </div>
@@ -58,7 +58,7 @@ const ExplorerPage: React.FC<ExplorerPageProps> = ({ onSelectDocument }) => {
           {MOCK_DOCUMENTS.map(doc => (
             <article 
               key={doc.id} 
-              className="group cursor-pointer"
+              className="group cursor-pointer p-8 md:p-10 border border-transparent hover:border-archive-border rounded-2xl hover:bg-white hover:shadow-xl transition-all duration-500"
               onClick={() => onSelectDocument(doc.id)}
             >
               <div className="flex justify-between items-baseline mb-6">
@@ -79,7 +79,7 @@ const ExplorerPage: React.FC<ExplorerPageProps> = ({ onSelectDocument }) => {
               </p>
               
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-                <span className="text-[10px] uppercase tracking-[0.2em] font-black border border-archive-black px-3 py-1.5 text-archive-black">
+                <span className="text-[10px] uppercase tracking-[0.2em] font-black border border-archive-black px-3 py-1.5 text-archive-black rounded-lg">
                   {doc.institution}
                 </span>
                 <div className="hidden sm:block h-px flex-1 bg-archive-border group-hover:bg-archive-accent transition-all duration-700"></div>

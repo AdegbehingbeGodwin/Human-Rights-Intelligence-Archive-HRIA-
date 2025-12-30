@@ -223,19 +223,19 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery }) => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:grid-8 max-w-2xl mx-auto">
               <button 
                 onClick={() => handleGlobalSearch("Compare human rights trends between Africa and the Americas.")}
-                className="p-6 border border-archive-border text-[10px] uppercase tracking-widest font-bold text-archive-muted hover:border-archive-black hover:text-archive-black transition-all text-left leading-relaxed"
+                className="p-6 border border-archive-border rounded-xl text-[10px] uppercase tracking-widest font-bold text-archive-muted hover:border-archive-black hover:text-archive-black transition-all text-left leading-relaxed shadow-sm hover:shadow-md"
               >
                 Trend Comparison: Regional Cross-Analysis
               </button>
               <button 
                 onClick={() => handleGlobalSearch("Synthesize the impact of surveillance technology on civil society in 2022.")}
-                className="p-6 border border-archive-border text-[10px] uppercase tracking-widest font-bold text-archive-muted hover:border-archive-black hover:text-archive-black transition-all text-left leading-relaxed"
+                className="p-6 border border-archive-border rounded-xl text-[10px] uppercase tracking-widest font-bold text-archive-muted hover:border-archive-black hover:text-archive-black transition-all text-left leading-relaxed shadow-sm hover:shadow-md"
               >
                 Thematic Review: Digital Sovereignty
               </button>
               <button 
                 onClick={() => handleGlobalSearch("Identify recurring land rights violations mentioned in the archive.")}
-                className="p-6 border border-archive-border text-[10px] uppercase tracking-widest font-bold text-archive-muted hover:border-archive-black hover:text-archive-black transition-all text-left leading-relaxed"
+                className="p-6 border border-archive-border rounded-xl text-[10px] uppercase tracking-widest font-bold text-archive-muted hover:border-archive-black hover:text-archive-black transition-all text-left leading-relaxed shadow-sm hover:shadow-md"
               >
                 Pattern Recognition: Land Defenders
               </button>
@@ -258,8 +258,8 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery }) => {
               </div>
             ) : (
               <div className="flex justify-start">
-                <div className="max-w-full border border-archive-border p-6 md:p-12 bg-white relative">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-archive-accent"></div>
+                <div className="max-w-[full] md:max-w-[full] border border-archive-border p-6 md:p-12 bg-white relative rounded-2xl shadow-sm overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1.5 h-full bg-archive-accent"></div>
                   <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6 md:mb-10 border-b border-archive-border pb-4 md:pb-6">
                     <h3 className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] font-black text-archive-black">Observatory Synthesis</h3>
                     <span className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] font-bold text-archive-muted/60">
@@ -286,7 +286,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery }) => {
                       {expandedSources.has(idx) && (
                         <div className="space-y-6 animate-fade-in">
                           {msg.sources.map((source, sIdx) => (
-                            <div key={sIdx} className="p-6 bg-archive-bg border-l-2 border-archive-muted/30">
+                            <div key={sIdx} className="p-6 bg-archive-bg border border-archive-border/40 rounded-xl">
                               <div className="flex justify-between items-start mb-4">
                                 <span className="text-[10px] font-bold text-archive-black uppercase tracking-tight">
                                   {source.metadata.organization || 'UNSPECIFIED'} {source.metadata.year || ''}
@@ -324,7 +324,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery }) => {
         
         {loading && (
           <div className="flex justify-start animate-pulse">
-            <div className="max-w-full md:max-w-[70%] border border-archive-border p-6 md:p-12 bg-white flex items-center space-x-4">
+            <div className="max-w-full md:max-w-[70%] border border-archive-border p-6 md:p-12 bg-white flex items-center space-x-4 rounded-2xl shadow-sm">
               <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-archive-accent rounded-full animate-bounce"></div>
               <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-archive-accent rounded-full animate-bounce [animation-delay:-.3s]"></div>
               <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-archive-accent rounded-full animate-bounce [animation-delay:-.5s]"></div>
@@ -337,19 +337,19 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery }) => {
 
       {/* Floating Sticky Input (Bottom) */}
       <div className="sticky bottom-6 md:bottom-12 z-20">
-        <div className="bg-white border border-archive-black p-3 md:p-6">
+        <div className="bg-white/80 backdrop-blur-xl border border-archive-black/10 p-3 md:p-4 rounded-3xl shadow-2xl">
           <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-3 md:gap-4">
             <input 
               type="text"
               placeholder="Query the archive..."
-              className="flex-1 bg-transparent py-2 md:py-4 text-base md:text-lg font-bold tracking-tight text-archive-black focus:outline-none placeholder:text-archive-muted/40"
+              className="flex-1 bg-transparent px-6 py-2 md:py-4 text-base md:text-lg font-bold tracking-tight text-archive-black focus:outline-none placeholder:text-archive-muted/40"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               disabled={loading}
             />
             <button 
               type="submit" 
-              className="px-4 md:px-8 py-3 md:py-0 bg-archive-black text-white text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-neutral-800 transition-colors disabled:opacity-20 flex justify-center items-center gap-3"
+              className="px-6 md:px-10 py-3 md:py-0 bg-archive-black text-white text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-neutral-800 transition-colors disabled:opacity-20 flex justify-center items-center gap-3 rounded-2xl"
               disabled={!query.trim() || loading}
             >
               <span>Consult Archive</span>

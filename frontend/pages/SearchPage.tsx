@@ -113,7 +113,6 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery }) => {
   const [query, setQuery] = useState(initialQuery || "");
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
-  const [expandedSources, setExpandedSources] = useState<Set<number>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
   const latestMessageRef = useRef<HTMLDivElement>(null);
   const hasAutoStarted = useRef(false);
@@ -122,7 +121,6 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery }) => {
     if (loading) {
       scrollRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
     } else {
-      // When response is ready, scroll to the top of the message
       const target = latestMessageRef.current || scrollRef.current;
       target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -148,8 +146,7 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery }) => {
       const data = await response.json();
       setChatHistory(prev => [...prev, { 
         role: 'model', 
-        text: data.answer,
-        sources: data.sources
+        text: data.answer
       }]);
     } catch (error) {
       setChatHistory(prev => [...prev, { 
@@ -171,15 +168,6 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     handleGlobalSearch();
-  };
-
-  const toggleSources = (idx: number) => {
-    setExpandedSources(prev => {
-      const next = new Set(prev);
-      if (next.has(idx)) next.delete(idx);
-      else next.add(idx);
-      return next;
-    });
   };
 
   return (
@@ -263,59 +251,12 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery }) => {
                   <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6 md:mb-10 border-b border-archive-border pb-4 md:pb-6">
                     <h3 className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] font-black text-archive-black">Observatory Synthesis</h3>
                     <span className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] font-bold text-archive-muted/60">
-                      {msg.sources ? `${msg.sources.length} Points of Evidence` : 'Grounded Analysis'}
+                      Grounded Analysis
                     </span>
                   </header>
                   <div className="serif text-editorial-body text-archive-black leading-relaxed">
                     <NarrativeRenderer text={msg.text} />
                   </div>
-                  
-                  {/* Sources Section */}
-                  {msg.sources && msg.sources.length > 0 && (
-                    <div className="mt-8 md:mt-12 space-y-6 md:space-y-8 border-t border-archive-border pt-8 md:pt-10">
-                      <div className="flex justify-between items-center">
-                        <h4 className="text-[8px] md:text-[9px] uppercase tracking-widest font-black text-archive-muted">Evidence Base</h4>
-                        <button 
-                          onClick={() => toggleSources(idx)}
-                          className="text-[9px] uppercase tracking-widest font-bold text-archive-accent hover:underline"
-                        >
-                          {expandedSources.has(idx) ? 'Collapse Sources' : 'View Raw Sources'}
-                        </button>
-                      </div>
-                      
-                      {expandedSources.has(idx) && (
-                        <div className="space-y-6 animate-fade-in">
-                          {msg.sources.map((source, sIdx) => (
-                            <div key={sIdx} className="p-6 bg-archive-bg border border-archive-border/40 rounded-xl">
-                              <div className="flex justify-between items-start mb-4">
-                                <span className="text-[10px] font-bold text-archive-black uppercase tracking-tight">
-                                  {source.metadata.organization || 'UNSPECIFIED'} {source.metadata.year || ''}
-                                </span>
-                                <span className="text-[10px] text-archive-muted font-mono">
-                                  Score: {source.score.toFixed(4)}
-                                </span>
-                              </div>
-                              <p className="text-xs text-archive-black/80 leading-relaxed italic mb-4">
-                                "...{source.text}..."
-                              </p>
-                              <div className="flex flex-wrap gap-2">
-                                {source.metadata.countries && typeof source.metadata.countries === 'string' && (
-                                  <span className="px-2 py-0.5 bg-white border border-archive-border text-[8px] uppercase font-bold text-archive-muted">
-                                    📍 {source.metadata.countries}
-                                  </span>
-                                )}
-                                {source.metadata.themes && Array.isArray(source.metadata.themes) && source.metadata.themes.map((theme: string) => (
-                                  <span key={theme} className="px-2 py-0.5 bg-archive-accent/10 text-archive-accent text-[8px] uppercase font-bold">
-                                    # {theme.replace(/_/g, ' ')}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
             )}

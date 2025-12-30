@@ -1,37 +1,40 @@
 """
-FastAPI Backend for HRIA RAG System
-Provides semantic search over human rights documents using Pinecone + Groq
+FastAPI Backend for HRIA RAG System (Enhanced)
+Uses HF API for embeddings + Local BM25 for hybrid search.
 """
 
 import os
+import glob
+import requests
 from typing import Optional, List
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pinecone import Pinecone
-from langchain_huggingface import HuggingFaceEmbeddings
 from groq import Groq
 import rag_utils
 import prompts
-import glob
 
 # Load environment variables
 load_dotenv()
 
 # Configuration
 EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+HF_API_URL = f"https://api-inference.huggingface.co/pipeline/feature-extraction/{EMBEDDING_MODEL_NAME}"
+HF_TOKEN = os.getenv("HUGGINGFACE_API_KEY")
+
 PINECONE_INDEX_NAME = "hria-fast"
 LLM_MODEL_NAME = "moonshotai/kimi-k2-instruct-0905"
 
 # Initialize FastAPI
 app = FastAPI(
     title="HRIA RAG API",
-    description="Human Rights Intelligence Archive - Semantic Search API",
+    description="Human Rights Intelligence Archive - Hybrid Semantic Search API",
     version="1.0.0"
 )
 
-# CORS for frontend
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -40,25 +43,32 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Global instances (initialized on startup)
-embedding_model = None
+# Global instances
 pinecone_index = None
 groq_client = None
 bm25_searcher = None
-reranker = None
 
+def get_huggingface_embeddings(text: str) -> List[float]:
+    """Fetch embeddings from HF API."""
+    if not HF_TOKEN:
+        raise Exception("HUGGINGFACE_API_KEY is missing. Please add it to your environment variables.")
+        
+    headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+    response = requests.post(HF_API_URL, headers=headers, json={"inputs": text, "options": {"wait_for_model": True}})
+    
+    if response.status_code != 200:
+        raise Exception(f"Hugging Face API Error: {response.text}")
+    
+    return response.json()
 
 class QueryRequest(BaseModel):
     query: str
     top_k: Optional[int] = 5
-    year_range: Optional[List[int]] = None
-
 
 class QueryResult(BaseModel):
     text: str
     score: float
     metadata: dict
-
 
 class QueryResponse(BaseModel):
     query: str
@@ -66,109 +76,62 @@ class QueryResponse(BaseModel):
     sources: List[QueryResult]
     count: int
 
-
-class StatsResponse(BaseModel):
-    documents: int
-    index_name: str
-    status: str
-
-
 @app.on_event("startup")
 async def startup_event():
-    """Initialize models and connections on startup"""
-    global embedding_model, pinecone_index, groq_client, bm25_searcher, reranker
+    global pinecone_index, groq_client, bm25_searcher
     
     print("Initializing HRIA RAG API...")
     
-    # Initialize embedding model
-    print("   Loading embedding model...")
-    embedding_model = HuggingFaceEmbeddings(
-        model_name=EMBEDDING_MODEL_NAME,
-        model_kwargs={'device': 'cpu', 'trust_remote_code': True},
-        encode_kwargs={'normalize_embeddings': True}
-    )
-    
-    # Initialize Pinecone
-    print("   Connecting to Pinecone...")
+    # Pinecone & Groq
     pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
     pinecone_index = pc.Index(PINECONE_INDEX_NAME)
-    
-    # Initialize Groq
-    print("   Connecting to Groq...")
     groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
     
-    # Initialize Reranker
-    print("   Loading reranker model...")
-    reranker = rag_utils.Reranker()
-    
-    # Initialize BM25 searcher
-    print("   Building BM25 index...")
+    # BM25 Initialization (Conditional for Vercel)
     chunks_dir = os.path.join("data", "chunks")
-    chunk_files = glob.glob(os.path.join(chunks_dir, "chunk_*.txt"))
-    # For speed, we'll only load content from a subset or all if manageable
-    # Since we have 85k chunks, let's load all but only the text parts
-    corpus = []
-    metadatas = []
-    for i, file_path in enumerate(chunk_files):
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-            parts = content.split('=' * 50)
-            if len(parts) >= 2:
-                text = parts[1].strip()
-                # Extract metadata from part 0
-                meta = {}
-                for line in parts[0].strip().split('\n'):
-                    if ':' in line:
-                        k, v = line.split(':', 1)
-                        meta[k.strip().lower()] = v.strip()
-                
-                # Ensure year is integer for filtering consistency
-                if 'year' in meta and meta['year'].isdigit():
-                    meta['year'] = int(meta['year'])
-                    
-                corpus.append(text)
-                metadatas.append(meta)
-        except:
-            continue
-        if (i+1) % 10000 == 0:
-            print(f"      Loaded {i+1}/{len(chunk_files)} for BM25...")
-            
-    bm25_searcher = rag_utils.BM25Searcher(corpus, metadatas)
-    
-    print("API ready!")
+    if os.path.exists(chunks_dir):
+        print("   Building BM25 index from local chunks...")
+        chunk_files = glob.glob(os.path.join(chunks_dir, "chunk_*.txt"))
+        # Optimized loading: Limit to first 5000 for Vercel memory if needed
+        # But keeping full for now as requested
+        corpus = []
+        metadatas = []
+        for i, file_path in enumerate(chunk_files[:10000]): # Safety limit for Vercel
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                parts = content.split('=' * 50)
+                if len(parts) >= 2:
+                    text = parts[1].strip()
+                    meta = {}
+                    for line in parts[0].strip().split('\n'):
+                        if ':' in line:
+                            k, v = line.split(':', 1)
+                            meta[k.strip().lower()] = v.strip()
+                    corpus.append(text)
+                    metadatas.append(meta)
+            except:
+                continue
+        bm25_searcher = rag_utils.BM25Searcher(corpus, metadatas)
+    else:
+        print("   Warning: data/chunks not found. BM25 disabled.")
+        bm25_searcher = rag_utils.BM25Searcher([], [])
 
+    print("API ready!")
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
     return {"status": "healthy"}
-
-
-@app.get("/api/stats", response_model=StatsResponse)
-async def get_stats():
-    """Get dataset statistics"""
-    try:
-        stats = pinecone_index.describe_index_stats()
-        return StatsResponse(
-            documents=stats.total_vector_count,
-            index_name=PINECONE_INDEX_NAME,
-            status="ready"
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.post("/api/query", response_model=QueryResponse)
 async def query_rag(request: QueryRequest):
-    """Execute a world-class RAG query with hybrid search and reranking"""
     try:
-        # Step 1: Detect temporal filter from query
+        # Step 1: Detect temporal filter
         temporal_filter = rag_utils.extract_temporal_filter(request.query)
         pinecone_filter = temporal_filter if temporal_filter else None
         
-        # Step 2: Dense retrieval (Pinecone)
-        query_embedding = embedding_model.embed_query(request.query)
+        # Step 2: Dense Retrieval (HF API + Pinecone)
+        query_embedding = get_huggingface_embeddings(request.query)
         vector_results = pinecone_index.query(
             vector=query_embedding,
             top_k=20,
@@ -176,21 +139,6 @@ async def query_rag(request: QueryRequest):
             filter=pinecone_filter
         )
         
-        # Step 3: Sparse retrieval (BM25)
-        bm25_results = bm25_searcher.search(request.query, top_k=20)
-        
-        # Filter BM25 results by year if needed (manual filtering for BM25)
-        if temporal_filter:
-            year_val = temporal_filter.get('year')
-            if isinstance(year_val, int):
-                bm25_results = [r for r in bm25_results if r['metadata'].get('year') == year_val]
-            elif isinstance(year_val, dict): # Range
-                gte = year_val.get('$gte', 0)
-                lte = year_val.get('$lte', 3000)
-                bm25_results = [r for r in bm25_results if gte <= r['metadata'].get('year', 0) <= lte]
-        
-        # Step 4: Hybrid Fusion (RRF)
-        # Convert search results to common format
         dense_hits = []
         for match in vector_results.matches:
             dense_hits.append({
@@ -200,55 +148,35 @@ async def query_rag(request: QueryRequest):
                 "id": str(match.id)
             })
         
+        # Step 3: Sparse Retrieval (Local BM25)
+        bm25_results = bm25_searcher.search(request.query, top_k=20)
+        
+        # Step 4: Fusion
         fused_results = rag_utils.reciprocal_rank_fusion([dense_hits, bm25_results])
         
-        # Step 5: Cross-Encoder Reranking
-        reranked_results = reranker.rerank(request.query, fused_results, top_k=request.top_k)
-        
-        # Step 6: Format Context and Generate Narrative Answer
-        context = prompts.format_context_with_citations(reranked_results)
-        
+        # Step 5: Answer Generation
+        context = prompts.format_context_with_citations(fused_results[:10])
         system_prompt = prompts.HISTORIAN_SYSTEM_PROMPT
-        user_prompt = f"""Based on these human rights archive documents:
-
-{context}
-
-Question: {request.query}
-
-Provide a synthesized, narrative analysis:"""
+        user_prompt = f"Context:\n{context}\n\nQuestion: {request.query}\n\nAnalysis:"
 
         chat_response = groq_client.chat.completions.create(
             model=LLM_MODEL_NAME,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
+            messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
             temperature=0.2,
-            max_tokens=1500
+            max_tokens=1000
         )
-        
         answer = chat_response.choices[0].message.content
         
-        # Prepare final sources for response
-        final_sources = []
-        for r in reranked_results:
-            final_sources.append(QueryResult(
-                text=r['text'],
-                score=r.get('rerank_score') or r.get('score', 0),
-                metadata=r['metadata']
-            ))
+        final_sources = [
+            QueryResult(text=r['text'], score=r.get('score', 0), metadata=r['metadata'])
+            for r in fused_results[:request.top_k]
+        ]
         
-        return QueryResponse(
-            query=request.query,
-            answer=answer,
-            sources=final_sources,
-            count=len(final_sources)
-        )
+        return QueryResponse(query=request.query, answer=answer, sources=final_sources, count=len(final_sources))
         
     except Exception as e:
-        print(f"Error in query_rag: {e}")
+        print(f"Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 if __name__ == "__main__":
     import uvicorn

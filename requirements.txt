@@ -1,19 +1,14 @@
 # Requirements for Human Rights Intelligence Archive (HRIA) RAG System
-langchain>=0.3.0
-langchain-community>=0.3.0
-langchain-huggingface>=1.2.0
-pymupdf>=1.26.0
-chromadb>=0.6.0
-groq>=0.18.0
-langchain-groq>=0.3.0
+# Optimized for Vercel with API embeddings but keeping BM25
 fastapi>=0.115.0
 uvicorn[standard]>=0.36.0
 python-dotenv>=1.0.0
-pypdf>=6.4.0
-sentence-transformers>=3.3.0
-torch>=2.0.0
-transformers>=4.35.0
 pinecone>=5.0.0
+groq>=0.18.0
+pydantic>=2.0.0
 rank-bm25>=0.2.2
-spacy>=3.7.0
-sentence-transformers>=3.3.0
+numpy>=1.24.0
+requests>=2.31.0
+langchain>=0.3.0
+langchain-community>=0.3.0
+# Heavy libraries (torch, transformers, spacy) REMOVED to fit Vercel 250MB limit

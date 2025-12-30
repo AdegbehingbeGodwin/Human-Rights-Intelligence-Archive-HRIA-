@@ -12,9 +12,9 @@ const ExplorerPage: React.FC<ExplorerPageProps> = ({ onSelectDocument }) => {
   const regions = Object.values(Region);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-20 flex gap-20">
+    <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-20 flex flex-col md:flex-row gap-12 md:gap-20">
       {/* Sidebar Navigation */}
-      <aside className="w-64 flex-shrink-0">
+      <aside className="w-full md:w-64 flex-shrink-0">
         <div className="sticky top-32 space-y-12">
           <div>
             <h3 className="text-[10px] uppercase tracking-widest font-bold text-archive-black mb-6">By Region</h3>
@@ -49,9 +49,9 @@ const ExplorerPage: React.FC<ExplorerPageProps> = ({ onSelectDocument }) => {
 
       {/* Main Content: Editorial Document List */}
       <main className="flex-1 max-w-2xl">
-        <header className="mb-24">
-          <h2 className="text-4xl font-bold uppercase tracking-tight text-archive-black mb-4">The Digital Archive</h2>
-          <p className="text-archive-muted text-sm italic font-light">Curated intelligence on global human rights trends.</p>
+        <header className="mb-12 md:mb-24">
+          <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-tight text-archive-black mb-4">The Digital Archive</h2>
+          <p className="text-archive-muted text-xs md:text-sm italic font-light">Curated intelligence on global human rights trends.</p>
         </header>
 
         <section className="space-y-24">
@@ -70,7 +70,7 @@ const ExplorerPage: React.FC<ExplorerPageProps> = ({ onSelectDocument }) => {
                 </span>
               </div>
               
-              <h3 className="text-2xl font-bold text-archive-black mb-6 group-hover:text-archive-muted transition-colors leading-tight uppercase">
+              <h3 className="text-xl md:text-2xl font-bold text-archive-black mb-4 md:mb-6 group-hover:text-archive-muted transition-colors leading-tight uppercase">
                 {doc.title}
               </h3>
               
@@ -78,11 +78,11 @@ const ExplorerPage: React.FC<ExplorerPageProps> = ({ onSelectDocument }) => {
                 {doc.abstract}
               </p>
               
-              <div className="flex items-center gap-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
                 <span className="text-[10px] uppercase tracking-[0.2em] font-black border border-archive-black px-3 py-1.5 text-archive-black">
                   {doc.institution}
                 </span>
-                <div className="h-px flex-1 bg-archive-border group-hover:bg-archive-accent transition-all duration-700"></div>
+                <div className="hidden sm:block h-px flex-1 bg-archive-border group-hover:bg-archive-accent transition-all duration-700"></div>
                 <button className="text-[10px] uppercase tracking-[0.2em] font-bold text-archive-black group-hover:translate-x-2 transition-transform">
                   Examine Document &rarr;
                 </button>

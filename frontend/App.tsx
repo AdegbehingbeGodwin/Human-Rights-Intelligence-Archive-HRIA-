@@ -69,7 +69,7 @@ const App: React.FC = () => {
 
       {/* Institutional Footer */}
       {currentPage !== 'landing' && currentPage !== 'document' && (
-        <footer className="max-w-7xl mx-auto px-6 py-20 border-t border-archive-border mt-32">
+        <footer className="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-20 border-t border-archive-border mt-16 md:mt-32">
           <div className="flex flex-col md:flex-row justify-between items-start gap-12">
             <div className="max-w-xs">
               <p className="text-[10px] uppercase tracking-widest font-bold text-archive-black mb-4">
@@ -79,7 +79,7 @@ const App: React.FC = () => {
                 A non-partisan digital observatory utilizing advanced intelligence to safeguard human rights documentation. Operated as a global public good.
               </p>
             </div>
-            <div className="flex gap-20">
+            <div className="flex flex-wrap gap-10 md:gap-20">
               <div>
                 <p className="text-[10px] uppercase tracking-widest font-bold text-archive-black mb-4">Contact</p>
                 <p className="text-xs text-archive-muted font-light">info@archive-intel.org</p>
@@ -92,7 +92,7 @@ const App: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="mt-20 pt-8 border-t border-archive-border flex justify-between">
+          <div className="mt-12 md:mt-20 pt-8 border-t border-archive-border flex flex-col sm:flex-row justify-between gap-4">
              <span className="text-[9px] uppercase tracking-widest font-bold text-archive-muted">
                © {new Date().getFullYear()} Global Human Rights Observatory
              </span>

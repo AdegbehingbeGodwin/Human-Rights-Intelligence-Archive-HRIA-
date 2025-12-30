@@ -30,24 +30,25 @@ const NarrativeRenderer: React.FC<{ text: string }> = ({ text }) => {
         if (headerMatch) {
           const [_, header, body] = headerMatch;
           return (
-            <div key={pIdx} className="group mb-12 animate-fade-in" style={{ animationDelay: `${pIdx * 150}ms` }}>
-              <div className="flex items-center gap-4 mb-6">
-                <div className="h-[1px] w-12 bg-archive-accent/40 group-hover:w-20 transition-all duration-700"></div>
-                <h4 className="text-[11px] uppercase tracking-[0.4em] font-black text-archive-accent whitespace-nowrap">
+            <div key={pIdx} className="group mb-8 md:mb-12 animate-fade-in" style={{ animationDelay: `${pIdx * 150}ms` }}>
+              <div className="flex items-center gap-4 mb-4 md:mb-6">
+                <div className="h-[1px] w-8 md:w-12 bg-archive-accent/40 group-hover:w-20 transition-all duration-700"></div>
+                <h4 className="text-[9px] md:text-[11px] uppercase tracking-[0.4em] font-black text-archive-accent whitespace-nowrap">
                   {header}
                 </h4>
               </div>
-              <div className="pl-16 border-l border-archive-border/30 group-hover:border-archive-accent/20 transition-colors">
-                <div className="opacity-90 leading-[1.8] text-[1.15rem]">
+              <div className="pl-6 md:pl-16 border-l border-archive-border/30 group-hover:border-archive-accent/20 transition-colors">
+                <div className="opacity-90 leading-[1.8] text-[1.05rem] md:text-[1.15rem]">
                   <TextFormatter text={body} isFirstParagraph={true} />
                 </div>
               </div>
             </div>
+            
           );
         }
 
         return (
-          <p key={pIdx} className="opacity-95 leading-[1.8] text-[1.15rem] mb-6 last:mb-0">
+          <p key={pIdx} className="opacity-95 leading-[1.8] text-[1.05rem] md:text-[1.15rem] mb-6 last:mb-0">
             <TextFormatter text={p} isFirstParagraph={false} />
           </p>
         );
@@ -69,7 +70,7 @@ const TextFormatter: React.FC<{ text: string; isFirstParagraph: boolean }> = ({ 
           const rest = part.slice(1);
           return (
             <React.Fragment key={i}>
-              <span className="float-left text-5xl font-black text-archive-black mr-3 mt-1 leading-[0.8] font-sans border-b-4 border-archive-accent/30">{firstChar}</span>
+              <span className="float-left text-4xl md:text-5xl font-black text-archive-black mr-2 md:mr-3 mt-1 leading-[0.8] font-sans border-b-4 border-archive-accent/30">{firstChar}</span>
               {rest}
             </React.Fragment>
           );
@@ -182,14 +183,14 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-20 min-h-screen flex flex-col">
-      <header className="mb-20 text-center">
-        <h2 className="text-[10px] uppercase tracking-[0.5em] font-bold text-archive-black mb-4">
+    <div className="max-w-4xl mx-auto px-4 md:px-6 py-10 md:py-20 min-h-screen flex flex-col">
+      <header className="mb-12 md:mb-20 text-center">
+        <h2 className="text-[9px] md:text-[10px] uppercase tracking-[0.5em] font-bold text-archive-black mb-4">
           Global Archive Analyst
         </h2>
-        <p className="text-sm text-archive-muted italic mb-8">Synthesizing intelligence across the institutional record.</p>
+        <p className="text-xs md:text-sm text-archive-muted italic mb-6 md:mb-8">Synthesizing intelligence across the institutional record.</p>
         
-        <div className="flex justify-center gap-8 text-[9px] uppercase tracking-widest font-bold border-t border-archive-muted/10 pt-8 mt-4">
+        <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-[8px] md:text-[9px] uppercase tracking-widest font-bold border-t border-archive-muted/10 pt-6 md:pt-8 mt-4">
           <a 
             href="https://www.amnesty.org/en/annual-report-archive/#h-2024-25-amnesty-international-annual-report" 
             target="_blank" 
@@ -214,12 +215,12 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery }) => {
       {/* Chat Display Area */}
       <div className="flex-1 space-y-16 mb-32">
         {chatHistory.length === 0 && !loading && (
-          <div className="text-center py-20 animate-fade-in">
-            <div className="w-16 h-px bg-archive-border mx-auto mb-12"></div>
-            <p className="text-4xl font-bold tracking-tight text-archive-black uppercase mb-12 opacity-20">
+          <div className="text-center py-10 md:py-20 animate-fade-in">
+            <div className="w-12 md:w-16 h-px bg-archive-border mx-auto mb-8 md:mb-12"></div>
+            <p className="text-2xl md:text-4xl font-bold tracking-tight text-archive-black uppercase mb-8 md:mb-12 opacity-20">
               Archive Idle
             </p>
-            <div className="grid md:grid-cols-3 gap-8 max-w-2xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:grid-8 max-w-2xl mx-auto">
               <button 
                 onClick={() => handleGlobalSearch("Compare human rights trends between Africa and the Americas.")}
                 className="p-6 border border-archive-border text-[10px] uppercase tracking-widest font-bold text-archive-muted hover:border-archive-black hover:text-archive-black transition-all text-left leading-relaxed"
@@ -250,18 +251,18 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery }) => {
           >
             {msg.role === 'user' ? (
               <div className="flex justify-end">
-                <div className="max-w-[85%] border-r-2 border-archive-black pr-8 text-right">
-                  <p className="text-[9px] uppercase tracking-[0.4em] font-black mb-3 text-archive-muted/40">Researcher Inquiry</p>
-                  <p className="text-3xl font-bold tracking-tight text-archive-black leading-tight">{msg.text}</p>
+                <div className="max-w-[90%] md:max-w-[85%] border-r-2 border-archive-black pr-4 md:pr-8 text-right">
+                  <p className="text-[8px] md:text-[9px] uppercase tracking-[0.4em] font-black mb-2 md:mb-3 text-archive-muted/40">Researcher Inquiry</p>
+                  <p className="text-xl md:text-3xl font-bold tracking-tight text-archive-black leading-tight">{msg.text}</p>
                 </div>
               </div>
             ) : (
               <div className="flex justify-start">
-                <div className="max-w-full border border-archive-border p-12 bg-white relative">
+                <div className="max-w-full border border-archive-border p-6 md:p-12 bg-white relative">
                   <div className="absolute top-0 left-0 w-1 h-full bg-archive-accent"></div>
-                  <header className="flex justify-between items-center mb-10 border-b border-archive-border pb-6">
-                    <h3 className="text-[10px] uppercase tracking-[0.3em] font-black text-archive-black">Observatory Synthesis</h3>
-                    <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-archive-muted/60">
+                  <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6 md:mb-10 border-b border-archive-border pb-4 md:pb-6">
+                    <h3 className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] font-black text-archive-black">Observatory Synthesis</h3>
+                    <span className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] font-bold text-archive-muted/60">
                       {msg.sources ? `${msg.sources.length} Points of Evidence` : 'Grounded Analysis'}
                     </span>
                   </header>
@@ -271,9 +272,9 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery }) => {
                   
                   {/* Sources Section */}
                   {msg.sources && msg.sources.length > 0 && (
-                    <div className="mt-12 space-y-8 border-t border-archive-border pt-10">
+                    <div className="mt-8 md:mt-12 space-y-6 md:space-y-8 border-t border-archive-border pt-8 md:pt-10">
                       <div className="flex justify-between items-center">
-                        <h4 className="text-[9px] uppercase tracking-widest font-black text-archive-muted">Evidence Base</h4>
+                        <h4 className="text-[8px] md:text-[9px] uppercase tracking-widest font-black text-archive-muted">Evidence Base</h4>
                         <button 
                           onClick={() => toggleSources(idx)}
                           className="text-[9px] uppercase tracking-widest font-bold text-archive-accent hover:underline"
@@ -323,11 +324,11 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery }) => {
         
         {loading && (
           <div className="flex justify-start animate-pulse">
-            <div className="max-w-[70%] border border-archive-border p-12 bg-white flex items-center space-x-4">
-              <div className="w-2 h-2 bg-archive-accent rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-archive-accent rounded-full animate-bounce [animation-delay:-.3s]"></div>
-              <div className="w-2 h-2 bg-archive-accent rounded-full animate-bounce [animation-delay:-.5s]"></div>
-              <span className="text-[10px] uppercase tracking-[0.3em] font-black text-archive-muted ml-4">Processing Intelligence...</span>
+            <div className="max-w-full md:max-w-[70%] border border-archive-border p-6 md:p-12 bg-white flex items-center space-x-4">
+              <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-archive-accent rounded-full animate-bounce"></div>
+              <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-archive-accent rounded-full animate-bounce [animation-delay:-.3s]"></div>
+              <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-archive-accent rounded-full animate-bounce [animation-delay:-.5s]"></div>
+              <span className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] font-black text-archive-muted ml-2 md:ml-4">Processing Intelligence...</span>
             </div>
           </div>
         )}
@@ -335,20 +336,20 @@ const SearchPage: React.FC<SearchPageProps> = ({ initialQuery }) => {
       </div>
 
       {/* Floating Sticky Input (Bottom) */}
-      <div className="sticky bottom-12 z-20">
-        <div className="bg-white border border-archive-black p-4 md:p-6">
-          <form onSubmit={handleSubmit} className="flex gap-4">
+      <div className="sticky bottom-6 md:bottom-12 z-20">
+        <div className="bg-white border border-archive-black p-3 md:p-6">
+          <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-3 md:gap-4">
             <input 
               type="text"
-              placeholder="Query the human rights intelligence archive..."
-              className="flex-1 bg-transparent py-4 text-lg font-bold tracking-tight text-archive-black focus:outline-none placeholder:text-archive-muted/40"
+              placeholder="Query the archive..."
+              className="flex-1 bg-transparent py-2 md:py-4 text-base md:text-lg font-bold tracking-tight text-archive-black focus:outline-none placeholder:text-archive-muted/40"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               disabled={loading}
             />
             <button 
               type="submit" 
-              className="px-8 bg-archive-black text-white text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-neutral-800 transition-colors disabled:opacity-20 flex items-center gap-3"
+              className="px-4 md:px-8 py-3 md:py-0 bg-archive-black text-white text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-neutral-800 transition-colors disabled:opacity-20 flex justify-center items-center gap-3"
               disabled={!query.trim() || loading}
             >
               <span>Consult Archive</span>

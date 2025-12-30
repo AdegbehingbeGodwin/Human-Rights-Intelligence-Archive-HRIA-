@@ -24,25 +24,25 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onInitialQuery }) =>
           Institutional Archive & Intelligence
         </span>
         
-        <h1 className="text-archive-title mb-16 tracking-tighter leading-[0.85] text-archive-black uppercase">
-          Human Rights <br />
-          Archive <br />
+        <h1 className="text-3xl md:text-5xl lg:text-archive-title mb-10 md:mb-16 tracking-tighter leading-[0.9] md:leading-[0.85] text-archive-black uppercase">
+          Human Rights <br className="hidden sm:block" />
+          Archive <br className="hidden sm:block" />
           Intelligence
         </h1>
         
         {/* Primary Feature: Global RAG Chatbot Entry */}
         <div className="w-full max-w-3xl mx-auto mb-20">
-          <form onSubmit={handleSubmit} className="relative group">
+          <form onSubmit={handleSubmit} className="relative group flex flex-col sm:block">
             <input 
               type="text"
-              placeholder="Query the global archive for patterns, trends, or evidence..."
+              placeholder="Query the global archive..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full bg-white border border-archive-black px-8 py-7 text-xl font-medium tracking-tight text-archive-black focus:outline-none placeholder:text-archive-muted/40 transition-all"
+              className="w-full bg-white border border-archive-black px-6 md:px-8 py-5 md:py-7 text-lg md:text-xl font-medium tracking-tight text-archive-black focus:outline-none placeholder:text-archive-muted/40 transition-all mb-3 sm:mb-0"
             />
             <button 
               type="submit"
-              className="absolute right-3 top-1/2 -translate-y-1/2 bg-archive-black text-white px-8 py-4 text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-neutral-800 transition-colors"
+              className="sm:absolute sm:right-3 sm:top-1/2 sm:-translate-y-1/2 bg-archive-black text-white px-6 md:px-8 py-4 text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-bold hover:bg-neutral-800 transition-colors w-full sm:w-auto"
             >
               Dispatch Inquiry
             </button>

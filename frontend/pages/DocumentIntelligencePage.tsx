@@ -57,9 +57,9 @@ const DocumentIntelligencePage: React.FC<DocumentIntelligencePageProps> = ({ doc
   };
 
   return (
-    <div className="flex h-[calc(100vh-64px)] overflow-hidden">
+    <div className="flex flex-col md:flex-row h-auto md:h-[calc(100vh-64px)] md:overflow-hidden">
       {/* Left: Document Reader */}
-      <div className="w-3/5 overflow-y-auto bg-white border-r border-archive-border p-12 lg:p-24 scroll-smooth">
+      <div className="w-full md:w-3/5 overflow-y-auto bg-white border-b md:border-b-0 md:border-r border-archive-border p-6 md:p-12 lg:p-24 scroll-smooth">
         <button 
           onClick={onBack}
           className="text-[10px] uppercase tracking-widest font-bold text-archive-muted hover:text-archive-black mb-12 flex items-center gap-2"
@@ -76,13 +76,13 @@ const DocumentIntelligencePage: React.FC<DocumentIntelligencePageProps> = ({ doc
               {document.institution}
             </span>
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-archive-black uppercase leading-[0.9] mb-8">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-archive-black uppercase leading-[0.9] mb-6 md:mb-8">
             {document.title}
           </h1>
           <div className="h-px w-full bg-archive-border mb-8"></div>
         </header>
 
-        <div className="max-w-[70ch] mx-auto serif text-editorial-body text-archive-black space-y-8 pb-32">
+        <div className="max-w-[70ch] mx-auto serif text-[1rem] md:text-editorial-body text-archive-black space-y-6 md:space-y-8 pb-10 md:pb-32">
           {document.fullText.split('\n').map((paragraph, idx) => (
             <p key={idx}>{paragraph}</p>
           ))}
@@ -90,7 +90,7 @@ const DocumentIntelligencePage: React.FC<DocumentIntelligencePageProps> = ({ doc
       </div>
 
       {/* Right: Intelligence Panel (RAG Chat) */}
-      <div className="w-2/5 flex flex-col bg-archive-offwhite border-l border-archive-border h-full">
+      <div className="w-full md:w-2/5 flex flex-col bg-archive-offwhite border-t md:border-t-0 md:border-l border-archive-border h-[600px] md:h-full">
         <div className="p-8 border-b border-archive-border flex justify-between items-center flex-shrink-0">
           <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold text-archive-black">
             Document Analyst Assistant
@@ -107,7 +107,7 @@ const DocumentIntelligencePage: React.FC<DocumentIntelligencePageProps> = ({ doc
         </div>
 
         {/* Chat History Area */}
-        <div className="flex-1 overflow-y-auto p-8 space-y-12">
+        <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 md:space-y-12">
           {intelligence && (
             <div className="space-y-6 animate-fade-in border-b border-archive-border pb-8">
               <h3 className="text-[10px] uppercase tracking-widest font-bold text-archive-muted">Initial Assessment</h3>
@@ -150,7 +150,7 @@ const DocumentIntelligencePage: React.FC<DocumentIntelligencePageProps> = ({ doc
         </div>
 
         {/* Input Area */}
-        <div className="p-8 border-t border-archive-border bg-white flex-shrink-0">
+        <div className="p-6 md:p-8 border-t border-archive-border bg-white flex-shrink-0">
           <form onSubmit={handleInquiry} className="relative">
             <input 
               type="text"

@@ -6,10 +6,11 @@ Uses HF API for embeddings + Local BM25 for hybrid search.
 import os
 import glob
 import requests
+import time
 from huggingface_hub import InferenceClient
 from typing import Optional, List
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pinecone import Pinecone
@@ -42,6 +43,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Vercel Web Analytics Middleware
+@app.middleware("http")
+async def add_analytics_middleware(request: Request, call_next):
+    """
+    Middleware to track API requests for Vercel Web Analytics.
+    This enables tracking of API usage and performance metrics.
+    """
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    
+    # Add custom headers for analytics tracking
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
 
 
 

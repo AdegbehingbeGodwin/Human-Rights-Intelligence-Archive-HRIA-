@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import Header from './components/Header';
 import ArchiveBackground from './components/ArchiveBackground';
 import LandingPage from './pages/LandingPage';
@@ -38,6 +39,7 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen">
       <ArchiveBackground />
+      <Analytics />
       
       {currentPage !== 'landing' && (
         <Header onNavigate={navigateTo} activePage={currentPage} />

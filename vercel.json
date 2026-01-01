@@ -23,6 +23,10 @@
       "dest": "main.py"
     },
     {
+      "src": "/_vercel/insights/(.*)",
+      "dest": "main.py"
+    },
+    {
       "src": "/(.*)",
       "dest": "/frontend/$1",
       "check": true
